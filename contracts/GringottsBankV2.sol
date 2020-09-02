@@ -19,7 +19,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
 
     event TransferDeposit(uint256 indexed _depositID, address indexed _oldDepositor, address indexed _newDepositor);
 
-    event Burndrop(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
+    event DepositCrossChain(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
 
     /*
      *  Constants
@@ -132,7 +132,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
     }
 
     /**
-     * @dev burndrop of deposit from  Ethereum network to Darwinia Network, params can be obtained by the function 'getDeposit'
+     * @dev transfer of deposit from  Ethereum network to Darwinia Network, params can be obtained by the function 'getDeposit'
      * @param _depositID - ID of deposit.
      * @param _depositor - depositor of deposit.
      * @param _months - months of deposit.
@@ -142,7 +142,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
      * @param _data - receiving address of darwinia network.
 
      */
-    function burndrop(uint256 _depositID, address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data) public {
+    function crossChain(uint256 _depositID, address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data) public {
         bytes32 darwiniaAddress;
 
         assembly {
@@ -163,8 +163,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
         require(deposits[_depositID].unitInterest == _unitInterest, "Params error: unitInterest");
         require(deposits[_depositID].value == _value, "Params error: amount");
 
-        require(_data.length == 33, "The address (Darwinia Network) must be in a 33 bytes hexadecimal format");
-        require(byte(_data[0]) == 0x2a, "Darwinia Network Address ss58 prefix is 42");
+        require(_data.length == 32, "The address (Darwinia Network) must be in a 32 bytes hexadecimal format");
         require(darwiniaAddress != bytes32(0x0), "Darwinia Network Address can't be empty");
 
         deposits[_depositID].claimed = true;
@@ -175,7 +174,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
         address ring = registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN);
         IBurnableERC20(ring).burn(address(this), _value);
 
-        emit Burndrop(_depositID, _depositor, _months, _startAt, _unitInterest, _value, _data);
+        emit DepositCrossChain(_depositID, _depositor, _months, _startAt, _unitInterest, _value, _data);
     }
 
     /**
