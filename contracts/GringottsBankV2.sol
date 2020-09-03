@@ -169,7 +169,8 @@ contract  GringottsBank is DSAuth, BankSettingIds {
             deposits[_depositID].months, 
             deposits[_depositID].startAt, 
             deposits[_depositID].unitInterest, 
-            deposits[_depositID].value, _data
+            deposits[_depositID].value, 
+            _data
         );
     }
 
