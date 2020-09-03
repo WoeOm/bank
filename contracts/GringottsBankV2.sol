@@ -19,7 +19,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
 
     event TransferDeposit(uint256 indexed _depositID, address indexed _oldDepositor, address indexed _newDepositor);
 
-    event DepositCrossChain(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
+    event BurnAndRedeem(uint256 indexed _depositID,  address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data);
 
     /*
      *  Constants
@@ -142,7 +142,7 @@ contract  GringottsBank is DSAuth, BankSettingIds {
      * @param _data - receiving address of darwinia network.
 
      */
-    function crossChain(uint256 _depositID, address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data) public {
+    function burnAndRedeem(uint256 _depositID, address _depositor, uint48 _months, uint48 _startAt, uint64 _unitInterest, uint128 _value, bytes _data) public {
         bytes32 darwiniaAddress;
 
         assembly {
@@ -173,8 +173,8 @@ contract  GringottsBank is DSAuth, BankSettingIds {
 
         address ring = registry.addressOf(SettingIds.CONTRACT_RING_ERC20_TOKEN);
         IBurnableERC20(ring).burn(address(this), _value);
-
-        emit DepositCrossChain(_depositID, _depositor, _months, _startAt, _unitInterest, _value, _data);
+        
+        emit BurnAndRedeem(_depositID, _depositor, _months, _startAt, _unitInterest, _value, _data);
     }
 
     /**
